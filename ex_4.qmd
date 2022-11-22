@@ -15,7 +15,7 @@ code-link: true
 
 # Exploring the count tables
 
-Here, import an example count table and do some exploration of the expression data. 
+Here, import an example count table and do some exploration of the expression data.
 
 ```{r}
 counts_file <- system.file("extdata/rna-seq/SRP029880.raw_counts.tsv",
@@ -23,7 +23,6 @@ counts_file <- system.file("extdata/rna-seq/SRP029880.raw_counts.tsv",
 coldata_file <- system.file("extdata/rna-seq/SRP029880.colData.tsv", 
                             package = "compGenomRData")
 ```
-
 
 ## Normalize the counts using the TPM approach.
 
@@ -98,3 +97,5 @@ corrplot::corrplot(correlation_matrix,
 I opened Github account, and installed git. Created a repository and commited and pushed the answers of this exercise through Rtudio.
 
 ## Insert the link to your Github account
+
+Here is the link: <https://github.com/lenavysotski>.
