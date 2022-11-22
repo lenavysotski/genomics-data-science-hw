@@ -1,0 +1,100 @@
+---
+title: "Exercise 4"
+author: "Yelena Vysotski"
+date: last-modified
+format: 
+  html:
+    self-contained: true
+toc: true
+toc-location: left
+number-sections: true
+code-fold: false
+code-tools: true
+code-link: true
+---
+
+# Exploring the count tables
+
+Here, import an example count table and do some exploration of the expression data. 
+
+```{r}
+counts_file <- system.file("extdata/rna-seq/SRP029880.raw_counts.tsv",
+                           package = "compGenomRData")
+coldata_file <- system.file("extdata/rna-seq/SRP029880.colData.tsv", 
+                            package = "compGenomRData")
+```
+
+
+## Normalize the counts using the TPM approach.
+
+```{r}
+# counts_file to matrix
+counts <- as.matrix(read.table(counts_file, header = T, sep = '\t'))
+
+# width column to geneLengths
+geneLengths <- as.vector(subset(counts, select = c(width)))
+
+
+# find gene length normalized values
+rpk <- apply( subset(counts, select = c(-width)), 2,
+              function(x) x/(geneLengths/1000))
+
+# normalize by the sample size using rpk values
+tpm <- apply(rpk, 2, function(x) x / sum(as.numeric(x)) * 10^6)
+
+# Check the sample sizes of tpm. 
+colSums(tpm)
+```
+
+## Plot a heatmap of the top 500 most variable genes. Compare with the heatmap obtained using the 100 most variable genes.
+
+```{r}
+# calculate var and arrange the results by variance in decreasing order
+var_m <- apply(tpm, 1, var)
+
+# select most variable genes
+selected_genes_1 <- names(var_m[order(var_m, decreasing = TRUE)][1:100])
+
+selected_genes_2 <- names(var_m[order(var_m, decreasing = TRUE)][1:500])
+
+# plot
+pheatmap::pheatmap(tpm[selected_genes_1,], scale = 'row', show_rownames = FALSE, 
+                   main = "100 most variable genes, scaled by row")
+
+pheatmap::pheatmap(tpm[selected_genes_2,], scale = 'row', show_rownames = FALSE, 
+                   main = "500 most variable genes, scaled by row")
+```
+
+## Re-do the heatmaps setting the `scale` argument to `none`, and `column`. Compare the results with `scale = 'row'`.
+
+```{r}
+# plot selected_genes_1
+pheatmap::pheatmap(tpm[selected_genes_1,], scale = 'none', show_rownames = FALSE, 
+                   main = "100 most variable genes, not scaled")
+pheatmap::pheatmap(tpm[selected_genes_1,], scale = 'column', show_rownames = FALSE,
+                   main = "100 most variable genes, scaled by column")
+
+# plot selected_genes_2
+pheatmap::pheatmap(tpm[selected_genes_2,], scale = 'none', show_rownames = FALSE,
+                   main = "500 most variable genes, not scaled")
+pheatmap::pheatmap(tpm[selected_genes_2,], scale = 'column', show_rownames = FALSE,
+                   main = "500 most variable genes, scaled by column")
+```
+
+## Draw a correlation plot for the samples depicting the sample differences as 'ellipses', drawing only the upper end of the matrix, and order samples by hierarchical clustering results based on `average` linkage clustering method.
+
+```{r}
+# correlation matrix
+correlation_matrix <- cor(tpm)
+
+# plot
+corrplot::corrplot(correlation_matrix,
+                   order = 'hclust', hclust.method = 'average',
+                   method = "ellipse", type = 'upper')
+```
+
+# Git and Github
+
+I opened Github account, and installed git. Created a repository and commited and pushed the answers of this exercise through Rtudio.
+
+## Insert the link to your Github account
